@@ -1,0 +1,7 @@
+interface:
+  display_name: "网页脚本分析"
+  short_description: "网页接口捕获与脚本化数据分析"
+  default_prompt: "Use $web-script-analysis to open a target web page, inspect page scripts and network APIs, then analyze data through stable interfaces."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,22 @@
+{
+  "name": "web-script-analysis",
+  "version": "0.3.0",
+  "description": "Portable web interface discovery and API-first data analysis workflows for Codex.",
+  "author": {
+    "name": "wuyicheng"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "网页脚本分析",
+    "shortDescription": "打开网页、发现接口并进行脚本化数据分析。",
+    "longDescription": "为 Codex 提供网页打开、登录态复用、页面脚本与网络接口发现、HAR 脱敏、API 请求复用和数据校验流程。",
+    "developerName": "wuyicheng",
+    "category": "Productivity",
+    "capabilities": [
+      "Browser interface discovery",
+      "API-first data analysis",
+      "Sanitized HAR analysis"
+    ],
+    "defaultPrompt": "Use $web-script-analysis to inspect a target page, discover its data interfaces, and analyze the results safely."
+  }
+}

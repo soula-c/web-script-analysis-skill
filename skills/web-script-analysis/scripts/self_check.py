@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+"""Check a web-script-analysis skill folder before sharing or installing."""
+
+from __future__ import annotations
+
+import argparse
+import re
+import sys
+from pathlib import Path
+
+
+REQUIRED_FILES = [
+    "SKILL.md",
+    "references/browser-setup.md",
+    "references/business-skill-authoring.md",
+    "references/codex-browser.md",
+    "references/interface-playbook.md",
+    "references/known-pages.md",
+    "references/tool-adapters.md",
+    "references/share-checklist.md",
+    "scripts/manage_business_skills.py",
+    "scripts/summarize_har.py",
+]
+
+SENSITIVE_PATTERNS = [
+    re.compile(pattern, re.I)
+    for pattern in [
+        r"C:\\Users\\[^\\\s]+",
+        r"/Users/[^/\s]+",
+        r"authorization\s*[:=]\s*['\"][^'\"]+",
+        r"cookie\s*[:=]\s*['\"][^'\"]+",
+        r"tenant_access_token\s*[:=]\s*['\"][^'\"]+",
+        r"app_secret\s*[:=]\s*['\"][^'\"]+",
+        r"smtp_password\s*[:=]\s*['\"][^'\"]+",
+    ]
+]
+
+
+def iter_text_files(root: Path):
+    for path in root.rglob("*"):
+        if path.is_file() and path.suffix.lower() in {".md", ".py", ".yaml", ".yml", ".json", ".txt"}:
+            yield path
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("skill_dir", type=Path)
+    args = parser.parse_args()
+
+    root = args.skill_dir.resolve()
+    errors: list[str] = []
+    for rel in REQUIRED_FILES:
+        if not (root / rel).is_file():
+            errors.append(f"missing required file: {rel}")
+
+    skill_md = root / "SKILL.md"
+    if skill_md.is_file():
+        text = skill_md.read_text(encoding="utf-8")
+        if "name: web-script-analysis" not in text:
+            errors.append("SKILL.md frontmatter must contain name: web-script-analysis")
+        if "web-script-analysis" not in text:
+            errors.append("SKILL.md should mention web-script-analysis for downstream invocation")
+
+    for path in iter_text_files(root):
+        if path.name == "self_check.py":
+            continue
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        for pattern in SENSITIVE_PATTERNS:
+            if pattern.search(text):
+                errors.append(f"possible sensitive or machine-specific value in {path.relative_to(root)}")
+                break
+
+    for rel in ("scripts/manage_business_skills.py", "scripts/summarize_har.py"):
+        path = root / rel
+        if path.is_file():
+            compile(path.read_text(encoding="utf-8"), str(path), "exec")
+
+    if errors:
+        print("web-script-analysis self-check failed:")
+        for error in errors:
+            print(f"- {error}")
+        return 1
+    print(f"web-script-analysis self-check passed: {root}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
