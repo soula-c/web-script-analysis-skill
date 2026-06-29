@@ -11,6 +11,19 @@ Prefer API-first analysis over visible-page scraping. Use the page only to disco
 
 Never store account names, passwords, cookies, authorization headers, tenant tokens, app secrets, private keys, or session snapshots in the skill, output files, commits, or memory.
 
+## Vsigo ERP Default Auth Policy
+
+For Vsigo ERP scenes under `*.vsigo.cn`, excluding `yuce.vsigo.cn`, default to environment-variable API login before using a manual browser login.
+
+Required first path:
+
+1. Read `references/vsigo-erp-login.md`.
+2. Check `ERP_USER` and `ERP_PASSWORD`, including supported aliases `TMALL_DAILY_ERP_USER` and `TMALL_DAILY_ERP_PASSWORD`.
+3. Run `python scripts/vsigo_erp_login.py --business-id sigo` to verify API login.
+4. When a browser session is needed, run `python scripts/vsigo_erp_login.py --business-id sigo --port <cdp-port> --inject-browser-state` before opening ERP pages.
+
+Manual login is a fallback only when credentials are missing, the helper fails, the page requires CAPTCHA/MFA/device trust/password change, or the user explicitly requests manual login. If credentials are missing, show the macOS/Linux, macOS launchd, and Windows PowerShell setup commands from `scripts/self_check.py` or `references/vsigo-erp-login.md` before asking the user to log in manually.
+
 ## Capability Detection
 
 Inspect the tools available in the current agent before choosing an implementation:
@@ -24,7 +37,7 @@ For general setup and portability details, read `references/browser-setup.md`. W
 
 For concrete adapter examples across Codex, Playwright/CDP-capable agents, and offline HAR workflows, read `references/tool-adapters.md`.
 
-For Vsigo ERP pages that lose login state in scheduled browser/API work, read `references/vsigo-erp-login.md`. Prefer reusing a logged-in dedicated Chrome profile first; use the helper only as a user-approved local recovery path with credentials supplied through machine-local environment variables.
+For Vsigo ERP pages (`*.vsigo.cn` except `yuce.vsigo.cn`), read `references/vsigo-erp-login.md` and use environment-variable API login as the default auth path before manual browser login.
 
 For Yuce pages (`https://yuce.vsigo.cn`) used by multiple scheduled or ad hoc report tasks, read `references/yuce-auth-guard.md`. Prefer a stable dedicated Chrome profile plus login-state preflight; if CAPTCHA or verification appears, stop for manual completion instead of attempting to bypass site controls.
 

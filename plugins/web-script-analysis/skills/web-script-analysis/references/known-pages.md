@@ -11,9 +11,11 @@ These are non-secret routing hints from recurring work. Verify live request deta
   - If CAPTCHA, MFA, device verification, or password expiry appears, leave the browser open and require manual completion.
 
 - `https://a.vsigo.cn/login` and Vsigo ERP-backed pages
-  - Use for ERP login-state recovery only after explicit user authorization.
+  - For `*.vsigo.cn` ERP scenes excluding `yuce.vsigo.cn`, default to environment-variable API login before manual browser login.
   - Read `references/vsigo-erp-login.md` before attempting credential-based recovery.
+  - First run `python scripts/vsigo_erp_login.py --business-id sigo`; add `--port <cdp-port> --inject-browser-state` when a browser session is required.
   - Credentials must come from local environment variables or private secret storage; never store them in scripts, skills, logs, or generated artifacts.
+  - If credentials are missing, show setup commands for macOS/Linux, macOS launchd, and Windows PowerShell before falling back to manual login.
   - If CAPTCHA, MFA, password expiry, device trust, or tenant ambiguity appears, stop and require manual login.
 
 - `https://yuce.vsigo.cn/#/resource/report-view/dzKgpN3J9c`

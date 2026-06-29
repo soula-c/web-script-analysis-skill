@@ -102,7 +102,8 @@ The preferred analysis pattern is API-first:
 - Do not copy browser profiles between machines.
 - Do not serialize cookies, authorization headers, tokens, or local storage.
 - Do not bundle browser extensions or silently install extensions.
-- Vsigo ERP API login is available only when `ERP_USER` and `ERP_PASSWORD` are set on that machine. Otherwise workflows must use an existing browser login or stop for manual login.
+- For Vsigo ERP scenes under `*.vsigo.cn`, excluding `yuce.vsigo.cn`, workflows default to environment-variable API login with `ERP_USER` and `ERP_PASSWORD` before manual browser login.
+- Manual login is a fallback only when credentials are missing, the API helper fails, CAPTCHA/MFA/device trust/password change appears, or the user explicitly asks for manual login.
 
 ## Creating Business Skills
 

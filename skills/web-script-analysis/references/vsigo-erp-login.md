@@ -4,7 +4,9 @@ Use this reference only for user-approved local recovery of Vsigo ERP login stat
 
 ## When To Use
 
-Prefer an existing logged-in dedicated Chrome profile. Use ERP login recovery only when all of these are true:
+For Vsigo ERP scenes under `*.vsigo.cn`, excluding `yuce.vsigo.cn`, use ERP API login from local environment variables as the default auth path. Do this before asking the user to log in manually or relying on an existing browser session.
+
+Use ERP login recovery when all of these are true:
 
 - The workflow targets Vsigo ERP pages such as `a.vsigo.cn`, `idata-dc-admin.vsigo.cn`, or `idata-platform.vsigo.cn`.
 - The user has explicitly authorized using their ERP account for local automation.
@@ -12,6 +14,18 @@ Prefer an existing logged-in dedicated Chrome profile. Use ERP login recovery on
 - The login page does not require CAPTCHA, MFA, password change, or other interactive approval.
 
 If CAPTCHA, MFA, device trust, password expiry, or tenant ambiguity appears, stop and ask for manual login. Do not attempt to bypass interactive security controls.
+
+## Default Agent Flow
+
+For ERP pages such as `a.vsigo.cn`, `idata-dc-admin.vsigo.cn`, `idata-platform.vsigo.cn`, and other non-Yuce `*.vsigo.cn` domains:
+
+1. Check for `ERP_USER` and `ERP_PASSWORD`, including aliases `TMALL_DAILY_ERP_USER` and `TMALL_DAILY_ERP_PASSWORD`.
+2. If present, run `python scripts/vsigo_erp_login.py --business-id sigo`.
+3. If a browser/CDP session is needed, run `python scripts/vsigo_erp_login.py --business-id sigo --port <cdp-port> --inject-browser-state`.
+4. Continue with API capture/replay only after this succeeds.
+5. Use manual login only if credentials are missing, the helper fails, CAPTCHA/MFA/device trust/password change appears, or the user explicitly asks for manual login.
+
+When credentials are missing, show the setup commands in the Environment Variables section instead of silently choosing manual login.
 
 ## Environment Variables
 
@@ -61,7 +75,7 @@ Remove-Variable plain, erpPassword
 ```
 
 After installing the skill on another machine, run `scripts/self_check.py`.
-If it reports that ERP environment variables are missing, API login recovery is not available on that machine yet and the workflow must use an existing browser login or manual login.
+If it reports that ERP environment variables are missing, configure them first. Manual login should not be the default for non-Yuce Vsigo ERP scenes.
 
 ## Interface Contract
 

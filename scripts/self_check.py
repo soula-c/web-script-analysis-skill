@@ -28,6 +28,18 @@ REQUIRED_FILES = [
     "scripts/vsigo_erp_login.py",
 ]
 
+REQUIRED_POLICY_SNIPPETS = [
+    "For Vsigo ERP scenes under `*.vsigo.cn`, excluding `yuce.vsigo.cn`, default to environment-variable API login",
+    "Manual login is a fallback only",
+    "python scripts/vsigo_erp_login.py --business-id sigo",
+]
+
+REQUIRED_AGENT_SNIPPETS = [
+    "default to environment-variable API login before manual browser login",
+    "python scripts/vsigo_erp_login.py --business-id sigo",
+    "Use manual login only if credentials are missing",
+]
+
 SENSITIVE_PATTERNS = [
     re.compile(pattern, re.I)
     for pattern in [
@@ -81,6 +93,16 @@ def main() -> int:
             errors.append("SKILL.md frontmatter must contain name: web-script-analysis")
         if "web-script-analysis" not in text:
             errors.append("SKILL.md should mention web-script-analysis for downstream invocation")
+        for snippet in REQUIRED_POLICY_SNIPPETS:
+            if snippet not in text:
+                errors.append(f"SKILL.md missing ERP default auth policy snippet: {snippet}")
+
+    agent_yaml = root / "agents/openai.yaml"
+    if agent_yaml.is_file():
+        text = agent_yaml.read_text(encoding="utf-8")
+        for snippet in REQUIRED_AGENT_SNIPPETS:
+            if snippet not in text:
+                errors.append(f"agents/openai.yaml missing ERP default auth prompt snippet: {snippet}")
 
     for path in iter_text_files(root):
         if path.name == "self_check.py":
