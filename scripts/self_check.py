@@ -103,8 +103,24 @@ def main() -> int:
 
     if not has_env("ERP_USER", ("TMALL_DAILY_ERP_USER",)) or not has_env("ERP_PASSWORD", ("TMALL_DAILY_ERP_PASSWORD",)):
         warnings.append(
-            "optional Vsigo ERP API login is not configured: set ERP_USER and ERP_PASSWORD "
-            "or aliases TMALL_DAILY_ERP_USER/TMALL_DAILY_ERP_PASSWORD on this machine."
+            "optional Vsigo ERP API login is not configured on this machine.\n"
+            "  macOS/Linux shell:\n"
+            "    export ERP_USER='your-erp-account'\n"
+            "    read -s ERP_PASSWORD\n"
+            "    export ERP_PASSWORD\n"
+            "  macOS launchd jobs:\n"
+            "    launchctl setenv ERP_USER 'your-erp-account'\n"
+            "    read -s ERP_PASSWORD\n"
+            "    launchctl setenv ERP_PASSWORD \"$ERP_PASSWORD\"\n"
+            "    unset ERP_PASSWORD\n"
+            "  Windows PowerShell:\n"
+            "    [Environment]::SetEnvironmentVariable(\"ERP_USER\", \"your-erp-account\", \"User\")\n"
+            "    $erpPassword = Read-Host \"ERP password\" -AsSecureString\n"
+            "    $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($erpPassword)\n"
+            "    $plain = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)\n"
+            "    [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)\n"
+            "    [Environment]::SetEnvironmentVariable(\"ERP_PASSWORD\", $plain, \"User\")\n"
+            "    Remove-Variable plain, erpPassword"
         )
 
     if errors:
