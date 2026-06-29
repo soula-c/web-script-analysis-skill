@@ -40,6 +40,29 @@ launchctl setenv ERP_PASSWORD "$ERP_PASSWORD"
 unset ERP_PASSWORD
 ```
 
+For an interactive macOS/Linux shell:
+
+```bash
+export ERP_USER='account'
+read -s ERP_PASSWORD
+export ERP_PASSWORD
+```
+
+For Windows PowerShell user-level variables:
+
+```powershell
+[Environment]::SetEnvironmentVariable("ERP_USER", "account", "User")
+$erpPassword = Read-Host "ERP password" -AsSecureString
+$bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($erpPassword)
+$plain = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)
+[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
+[Environment]::SetEnvironmentVariable("ERP_PASSWORD", $plain, "User")
+Remove-Variable plain, erpPassword
+```
+
+After installing the skill on another machine, run `scripts/self_check.py`.
+If it reports that ERP environment variables are missing, API login recovery is not available on that machine yet and the workflow must use an existing browser login or manual login.
+
 ## Interface Contract
 
 Live page inspection confirmed this current flow:

@@ -32,6 +32,24 @@ cp -R skills/web-script-analysis ~/.codex/skills/
 python ~/.codex/skills/web-script-analysis/scripts/self_check.py ~/.codex/skills/web-script-analysis
 ```
 
+Optional ERP API login setup for Vsigo workflows:
+
+```bash
+export ERP_USER='your-erp-account'
+read -s ERP_PASSWORD
+export ERP_PASSWORD
+python ~/.codex/skills/web-script-analysis/scripts/vsigo_erp_login.py --business-id sigo
+```
+
+For macOS jobs launched by `launchd`, store the values in the launchd environment instead of only the current shell:
+
+```bash
+launchctl setenv ERP_USER 'your-erp-account'
+read -s ERP_PASSWORD
+launchctl setenv ERP_PASSWORD "$ERP_PASSWORD"
+unset ERP_PASSWORD
+```
+
 Codex on Windows PowerShell:
 
 ```powershell
@@ -39,6 +57,19 @@ $target = Join-Path $HOME ".codex\skills"
 New-Item -ItemType Directory -Force $target | Out-Null
 Copy-Item -Recurse -Force .\skills\web-script-analysis $target
 python (Join-Path $target "web-script-analysis\scripts\self_check.py") (Join-Path $target "web-script-analysis")
+```
+
+Optional ERP API login setup for Vsigo workflows:
+
+```powershell
+[Environment]::SetEnvironmentVariable("ERP_USER", "your-erp-account", "User")
+$erpPassword = Read-Host "ERP password" -AsSecureString
+$bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($erpPassword)
+$plain = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)
+[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
+[Environment]::SetEnvironmentVariable("ERP_PASSWORD", $plain, "User")
+Remove-Variable plain, erpPassword
+python (Join-Path $target "web-script-analysis\scripts\vsigo_erp_login.py") --business-id sigo
 ```
 
 For other agents, import the `skills/web-script-analysis` folder according to that agent's skill or tool packaging mechanism.
@@ -71,6 +102,7 @@ The preferred analysis pattern is API-first:
 - Do not copy browser profiles between machines.
 - Do not serialize cookies, authorization headers, tokens, or local storage.
 - Do not bundle browser extensions or silently install extensions.
+- Vsigo ERP API login is available only when `ERP_USER` and `ERP_PASSWORD` are set on that machine. Otherwise workflows must use an existing browser login or stop for manual login.
 
 ## Creating Business Skills
 

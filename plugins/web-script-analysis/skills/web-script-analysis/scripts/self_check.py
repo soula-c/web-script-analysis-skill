@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 import argparse
+import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -46,6 +48,20 @@ def iter_text_files(root: Path):
             yield path
 
 
+def launchctl_getenv(name: str) -> str:
+    try:
+        return subprocess.check_output(["launchctl", "getenv", name], text=True, stderr=subprocess.DEVNULL).strip("\n")
+    except Exception:
+        return ""
+
+
+def has_env(name: str, aliases: tuple[str, ...]) -> bool:
+    for key in (name, *aliases):
+        if os.environ.get(key) or launchctl_getenv(key):
+            return True
+    return False
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("skill_dir", type=Path)
@@ -53,6 +69,7 @@ def main() -> int:
 
     root = args.skill_dir.resolve()
     errors: list[str] = []
+    warnings: list[str] = []
     for rel in REQUIRED_FILES:
         if not (root / rel).is_file():
             errors.append(f"missing required file: {rel}")
@@ -84,12 +101,22 @@ def main() -> int:
         if path.is_file():
             compile(path.read_text(encoding="utf-8"), str(path), "exec")
 
+    if not has_env("ERP_USER", ("TMALL_DAILY_ERP_USER",)) or not has_env("ERP_PASSWORD", ("TMALL_DAILY_ERP_PASSWORD",)):
+        warnings.append(
+            "optional Vsigo ERP API login is not configured: set ERP_USER and ERP_PASSWORD "
+            "or aliases TMALL_DAILY_ERP_USER/TMALL_DAILY_ERP_PASSWORD on this machine."
+        )
+
     if errors:
         print("web-script-analysis self-check failed:")
         for error in errors:
             print(f"- {error}")
         return 1
     print(f"web-script-analysis self-check passed: {root}")
+    if warnings:
+        print("Warnings:")
+        for warning in warnings:
+            print(f"- {warning}")
     return 0
 
 

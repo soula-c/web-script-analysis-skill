@@ -1,7 +1,7 @@
 interface:
   display_name: "网页脚本分析"
   short_description: "网页接口捕获与脚本化数据分析"
-  default_prompt: "Use $web-script-analysis to open a target web page, inspect page scripts and network APIs, then analyze data through stable interfaces. For ERP scenes under *.vsigo.cn (excluding yuce.vsigo.cn), provide two login options: account/password login and manual page login. For account/password login, prefer unified entry https://a.vsigo.cn/login and run `python scripts/erp_auth.py login --target https://a.vsigo.cn/login --username <user>` after collecting password securely; continue if successful, otherwise guide manual login."
+  default_prompt: "Use $web-script-analysis to open a target web page, inspect page scripts and network APIs, then analyze data through stable interfaces. For ERP scenes under *.vsigo.cn (excluding yuce.vsigo.cn), first read references/vsigo-erp-login.md. If ERP_USER and ERP_PASSWORD are configured locally, run `python scripts/vsigo_erp_login.py --business-id sigo` for API login, or add `--port <cdp-port> --inject-browser-state` when browser state must be recovered. If the environment variables are missing, explicitly tell the user to set them or use manual page login."
 
 policy:
   allow_implicit_invocation: true
