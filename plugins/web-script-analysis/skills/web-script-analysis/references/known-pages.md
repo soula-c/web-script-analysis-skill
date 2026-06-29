@@ -4,6 +4,18 @@ These are non-secret routing hints from recurring work. Verify live request deta
 
 ## Vsigo / Yuce Reports
 
+- `https://yuce.vsigo.cn` login-state management
+  - Use for Yuce scheduled tasks and report pages that need a durable authenticated Chrome/CDP session.
+  - Read `references/yuce-auth-guard.md` before adding preflight checks to a Yuce business workflow.
+  - Do not store Yuce passwords, cookies, localStorage values, session snapshots, or raw report payloads in skills or logs.
+  - If CAPTCHA, MFA, device verification, or password expiry appears, leave the browser open and require manual completion.
+
+- `https://a.vsigo.cn/login` and Vsigo ERP-backed pages
+  - Use for ERP login-state recovery only after explicit user authorization.
+  - Read `references/vsigo-erp-login.md` before attempting credential-based recovery.
+  - Credentials must come from local environment variables or private secret storage; never store them in scripts, skills, logs, or generated artifacts.
+  - If CAPTCHA, MFA, password expiry, device trust, or tenant ambiguity appears, stop and require manual login.
+
 - `https://yuce.vsigo.cn/#/resource/report-view/dzKgpN3J9c`
   - Use for 万相台低效计划监控 and similar resource report pages.
   - Known API family: `getCardData`.

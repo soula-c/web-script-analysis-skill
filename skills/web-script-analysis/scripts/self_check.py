@@ -16,10 +16,14 @@ REQUIRED_FILES = [
     "references/codex-browser.md",
     "references/interface-playbook.md",
     "references/known-pages.md",
+    "references/yuce-auth-guard.md",
+    "references/vsigo-erp-login.md",
     "references/tool-adapters.md",
     "references/share-checklist.md",
     "scripts/manage_business_skills.py",
     "scripts/summarize_har.py",
+    "scripts/yuce_auth_guard.py",
+    "scripts/vsigo_erp_login.py",
 ]
 
 SENSITIVE_PATTERNS = [
@@ -70,7 +74,12 @@ def main() -> int:
                 errors.append(f"possible sensitive or machine-specific value in {path.relative_to(root)}")
                 break
 
-    for rel in ("scripts/manage_business_skills.py", "scripts/summarize_har.py"):
+    for rel in (
+        "scripts/manage_business_skills.py",
+        "scripts/summarize_har.py",
+        "scripts/yuce_auth_guard.py",
+        "scripts/vsigo_erp_login.py",
+    ):
         path = root / rel
         if path.is_file():
             compile(path.read_text(encoding="utf-8"), str(path), "exec")

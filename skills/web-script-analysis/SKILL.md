@@ -24,6 +24,10 @@ For general setup and portability details, read `references/browser-setup.md`. W
 
 For concrete adapter examples across Codex, Playwright/CDP-capable agents, and offline HAR workflows, read `references/tool-adapters.md`.
 
+For Vsigo ERP pages that lose login state in scheduled browser/API work, read `references/vsigo-erp-login.md`. Prefer reusing a logged-in dedicated Chrome profile first; use the helper only as a user-approved local recovery path with credentials supplied through machine-local environment variables.
+
+For Yuce pages (`https://yuce.vsigo.cn`) used by multiple scheduled or ad hoc report tasks, read `references/yuce-auth-guard.md`. Prefer a stable dedicated Chrome profile plus login-state preflight; if CAPTCHA or verification appears, stop for manual completion instead of attempting to bypass site controls.
+
 ## Workflow
 
 1. Identify the target page, date range, business scope, and final metric or artifact.
