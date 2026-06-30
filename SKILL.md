@@ -24,6 +24,13 @@ Required first path:
 
 Manual login is a fallback only when credentials are missing, the helper fails, the page requires CAPTCHA/MFA/device trust/password change, or the user explicitly requests manual login. If credentials are missing, show the macOS/Linux, macOS launchd, and Windows PowerShell setup commands from `scripts/self_check.py` or `references/vsigo-erp-login.md` before asking the user to log in manually.
 
+When credentials are missing, do not silently choose manual login. Ask the user to choose:
+
+1. Set ERP environment variables now (Recommended): show exact commands for macOS/Linux, macOS launchd, and Windows PowerShell, then retry `python scripts/vsigo_erp_login.py --business-id sigo`.
+2. Continue with manual browser login for this run only.
+
+If the user does not explicitly choose manual login, keep the recommended path as environment-variable setup.
+
 ## Capability Detection
 
 Inspect the tools available in the current agent before choosing an implementation:
@@ -44,7 +51,7 @@ For Yuce pages (`https://yuce.vsigo.cn`) used by multiple scheduled or ad hoc re
 ## Workflow
 
 1. Identify the target page, date range, business scope, and final metric or artifact.
-2. Open the page through the best available browser surface. If the user is already logged in, preserve that session and reuse the existing tab or dedicated profile when available.
+2. For non-Yuce Vsigo ERP pages, run the ERP default auth policy above before opening the page. For all other pages, open the page through the best available browser surface. If the user is already logged in, preserve that session and reuse the existing tab or dedicated profile when available.
 3. Capture the interface evidence:
    - page URL and visible filters
    - relevant XHR/fetch endpoints

@@ -15,7 +15,7 @@ These are non-secret routing hints from recurring work. Verify live request deta
   - Read `references/vsigo-erp-login.md` before attempting credential-based recovery.
   - First run `python scripts/vsigo_erp_login.py --business-id sigo`; add `--port <cdp-port> --inject-browser-state` when a browser session is required.
   - Credentials must come from local environment variables or private secret storage; never store them in scripts, skills, logs, or generated artifacts.
-  - If credentials are missing, show setup commands for macOS/Linux, macOS launchd, and Windows PowerShell before falling back to manual login.
+  - If credentials are missing, ask the user to choose: set environment variables now (recommended, show macOS/Linux, macOS launchd, and Windows PowerShell commands) or manual browser login for this run only.
   - If CAPTCHA, MFA, password expiry, device trust, or tenant ambiguity appears, stop and require manual login.
 
 - `https://yuce.vsigo.cn/#/resource/report-view/dzKgpN3J9c`

@@ -25,7 +25,12 @@ For ERP pages such as `a.vsigo.cn`, `idata-dc-admin.vsigo.cn`, `idata-platform.v
 4. Continue with API capture/replay only after this succeeds.
 5. Use manual login only if credentials are missing, the helper fails, CAPTCHA/MFA/device trust/password change appears, or the user explicitly asks for manual login.
 
-When credentials are missing, show the setup commands in the Environment Variables section instead of silently choosing manual login.
+When credentials are missing, do not silently choose manual login. Present this choice:
+
+1. Set ERP environment variables now (Recommended): show the commands in the Environment Variables section, wait for the user to configure them, then rerun `python scripts/vsigo_erp_login.py --business-id sigo`.
+2. Continue with manual browser login for this run only.
+
+If the user does not explicitly choose manual login, keep the recommended path as environment-variable setup.
 
 ## Environment Variables
 
@@ -75,7 +80,7 @@ Remove-Variable plain, erpPassword
 ```
 
 After installing the skill on another machine, run `scripts/self_check.py`.
-If it reports that ERP environment variables are missing, configure them first. Manual login should not be the default for non-Yuce Vsigo ERP scenes.
+If it reports that ERP environment variables are missing, configure them first or explicitly choose manual login for that run. Manual login should not be the default for non-Yuce Vsigo ERP scenes.
 
 ## Interface Contract
 

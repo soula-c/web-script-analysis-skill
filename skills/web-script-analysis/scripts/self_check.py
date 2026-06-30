@@ -31,13 +31,16 @@ REQUIRED_FILES = [
 REQUIRED_POLICY_SNIPPETS = [
     "For Vsigo ERP scenes under `*.vsigo.cn`, excluding `yuce.vsigo.cn`, default to environment-variable API login",
     "Manual login is a fallback only",
+    "When credentials are missing, do not silently choose manual login",
     "python scripts/vsigo_erp_login.py --business-id sigo",
 ]
 
 REQUIRED_AGENT_SNIPPETS = [
     "default to environment-variable API login before manual browser login",
+    "do not silently choose manual login",
+    "setting ERP environment variables now (Recommended",
     "python scripts/vsigo_erp_login.py --business-id sigo",
-    "Use manual login only if credentials are missing",
+    "Use manual login only if the user chooses it",
 ]
 
 SENSITIVE_PATTERNS = [
