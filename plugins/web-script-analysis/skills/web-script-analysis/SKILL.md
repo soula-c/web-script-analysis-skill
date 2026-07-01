@@ -11,6 +11,12 @@ Prefer API-first analysis over visible-page scraping. Use the page only to disco
 
 Never store account names, passwords, cookies, authorization headers, tenant tokens, app secrets, private keys, or session snapshots in the skill, output files, commits, or memory.
 
+## Browser Fallback Accountability
+
+For recurring authenticated data tasks, opening or controlling Chrome/CDP is a fallback unless the task is explicitly UI-oriented. Before browser use, check for an existing script, request template, endpoint note, sanitized HAR summary, or business `data-source-map.md` entry. Use browser/CDP only when a direct API path is blocked by a missing or changed request shape, short-lived page-derived parameter, required manual verification, or explicit screenshot/UI debugging need.
+
+When a task falls back to browser/CDP, state the reason, classify any no-response failure as port, target, login, page, endpoint, network, or timeout, and preserve non-secret request/validation notes so the next run can move back toward API-first execution.
+
 ## Vsigo ERP Default Auth Policy
 
 For Vsigo ERP scenes under `*.vsigo.cn`, excluding `yuce.vsigo.cn`, default to environment-variable API login before using a manual browser login.
