@@ -30,16 +30,21 @@ REQUIRED_FILES = [
 
 REQUIRED_POLICY_SNIPPETS = [
     "For Vsigo ERP scenes under `*.vsigo.cn`, excluding `yuce.vsigo.cn`, default to environment-variable API login",
+    "For `https://yuce.vsigo.cn`, default to the Yuce login-state guard",
+    "Check `YUCE_USER` and `YUCE_PASSWORD`",
     "Manual login is a fallback only",
     "When credentials are missing, do not silently choose manual login",
     "python scripts/vsigo_erp_login.py --business-id sigo",
+    "python scripts/yuce_auth_guard.py --port <yuce-cdp-port>",
 ]
 
 REQUIRED_AGENT_SNIPPETS = [
     "default to environment-variable API login before manual browser login",
+    "For Yuce pages under https://yuce.vsigo.cn",
+    "YUCE_USER/YUCE_PASSWORD",
     "do not silently choose manual login",
-    "setting ERP environment variables now (Recommended",
     "python scripts/vsigo_erp_login.py --business-id sigo",
+    "python scripts/yuce_auth_guard.py --port <yuce-cdp-port>",
     "Use manual login only if the user chooses it",
 ]
 
@@ -146,6 +151,28 @@ def main() -> int:
             "    [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)\n"
             "    [Environment]::SetEnvironmentVariable(\"ERP_PASSWORD\", $plain, \"User\")\n"
             "    Remove-Variable plain, erpPassword"
+        )
+
+    if not has_env("YUCE_USER", ("YUCE_USERNAME",)) or not has_env("YUCE_PASSWORD", ("YUCE_PASS",)):
+        warnings.append(
+            "optional Yuce password login is not configured on this machine.\n"
+            "  macOS/Linux shell:\n"
+            "    export YUCE_USER='your-yuce-account'\n"
+            "    read -s YUCE_PASSWORD\n"
+            "    export YUCE_PASSWORD\n"
+            "  macOS launchd jobs:\n"
+            "    launchctl setenv YUCE_USER 'your-yuce-account'\n"
+            "    read -s YUCE_PASSWORD\n"
+            "    launchctl setenv YUCE_PASSWORD \"$YUCE_PASSWORD\"\n"
+            "    unset YUCE_PASSWORD\n"
+            "  Windows PowerShell:\n"
+            "    [Environment]::SetEnvironmentVariable(\"YUCE_USER\", \"your-yuce-account\", \"User\")\n"
+            "    $yucePassword = Read-Host \"Yuce password\" -AsSecureString\n"
+            "    $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($yucePassword)\n"
+            "    $plain = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)\n"
+            "    [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)\n"
+            "    [Environment]::SetEnvironmentVariable(\"YUCE_PASSWORD\", $plain, \"User\")\n"
+            "    Remove-Variable plain, yucePassword"
         )
 
     if errors:

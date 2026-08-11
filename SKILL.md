@@ -37,6 +37,21 @@ When credentials are missing, do not silently choose manual login. Ask the user 
 
 If the user does not explicitly choose manual login, keep the recommended path as environment-variable setup.
 
+## Yuce Default Auth Policy
+
+For `https://yuce.vsigo.cn`, default to the Yuce login-state guard before report API capture or replay. The guard should reuse port `9224` with `~/.codex/chrome-yuce-tmall-review` and, when the page is on a normal account/password login surface, read `YUCE_USER` and `YUCE_PASSWORD` from local environment variables or macOS `launchctl getenv` and submit the login form with CDP trusted keyboard input.
+
+Yuce is not the same as ERP API login: do not inject tokens, serialize session state, or bypass site controls. If CAPTCHA, SMS code, MFA, slider, device verification, password expiry, or another security step appears, stop and ask the user to complete that step in the visible Yuce browser.
+
+Required first path for Yuce:
+
+1. Read `references/yuce-auth-guard.md`.
+2. Check `YUCE_USER` and `YUCE_PASSWORD`, including supported aliases `YUCE_USERNAME` and `YUCE_PASS`.
+3. Run `python scripts/yuce_auth_guard.py --port <yuce-cdp-port> --url <target-yuce-url> --open-if-missing --require-auth`.
+4. Continue with API capture/replay only after the guard reports `login_state: authenticated`.
+
+When credentials are missing, show the macOS/Linux, macOS launchd, and Windows PowerShell setup commands from `references/yuce-auth-guard.md` before asking the user to log in manually. Manual login is a fallback only when credentials are missing, the helper cannot resolve the password form, CAPTCHA/MFA/device trust/password change appears, or the user explicitly requests manual login. If values appear in the fields but no login request is sent, classify it as a guard/frontend input compatibility bug and repair or update the guard; do not ask the user to type the same credentials again.
+
 ## Capability Detection
 
 Inspect the tools available in the current agent before choosing an implementation:
@@ -52,12 +67,12 @@ For concrete adapter examples across Codex, Playwright/CDP-capable agents, and o
 
 For Vsigo ERP pages (`*.vsigo.cn` except `yuce.vsigo.cn`), read `references/vsigo-erp-login.md` and use environment-variable API login as the default auth path before manual browser login.
 
-For Yuce pages (`https://yuce.vsigo.cn`) used by multiple scheduled or ad hoc report tasks, read `references/yuce-auth-guard.md`. Prefer a stable dedicated Chrome profile plus login-state preflight; if CAPTCHA or verification appears, stop for manual completion instead of attempting to bypass site controls.
+For Yuce pages (`https://yuce.vsigo.cn`) used by multiple scheduled or ad hoc report tasks, read `references/yuce-auth-guard.md`. Prefer a stable dedicated Chrome profile plus environment-variable password login through the guard; if CAPTCHA or verification appears, stop for manual completion instead of attempting to bypass site controls.
 
 ## Workflow
 
 1. Identify the target page, date range, business scope, and final metric or artifact.
-2. For non-Yuce Vsigo ERP pages, run the ERP default auth policy above before opening the page. For all other pages, open the page through the best available browser surface. If the user is already logged in, preserve that session and reuse the existing tab or dedicated profile when available.
+2. For non-Yuce Vsigo ERP pages, run the ERP default auth policy above before opening the page. For Yuce pages, run the Yuce default auth policy above before report API calls. For all other pages, open the page through the best available browser surface. If the user is already logged in, preserve that session and reuse the existing tab or dedicated profile when available.
 3. Capture the interface evidence:
    - page URL and visible filters
    - relevant XHR/fetch endpoints

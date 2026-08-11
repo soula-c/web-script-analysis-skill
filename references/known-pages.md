@@ -7,8 +7,9 @@ These are non-secret routing hints from recurring work. Verify live request deta
 - `https://yuce.vsigo.cn` login-state management
   - Use for Yuce scheduled tasks and report pages that need a durable authenticated Chrome/CDP session.
   - Read `references/yuce-auth-guard.md` before adding preflight checks to a Yuce business workflow.
+  - Default to `python scripts/yuce_auth_guard.py --port <yuce-cdp-port> --url <target-url> --open-if-missing --require-auth`; the guard reads `YUCE_USER` / `YUCE_PASSWORD` or aliases `YUCE_USERNAME` / `YUCE_PASS` and tries normal password login when possible.
   - Do not store Yuce passwords, cookies, localStorage values, session snapshots, or raw report payloads in skills or logs.
-  - If CAPTCHA, MFA, device verification, or password expiry appears, leave the browser open and require manual completion.
+  - If CAPTCHA, SMS code, MFA, slider, device verification, or password expiry appears, leave the browser open and require manual completion.
 
 - `https://a.vsigo.cn/login` and Vsigo ERP-backed pages
   - For `*.vsigo.cn` ERP scenes excluding `yuce.vsigo.cn`, default to environment-variable API login before manual browser login.

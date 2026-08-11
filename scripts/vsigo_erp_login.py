@@ -240,12 +240,45 @@ def open_tab(port: int, url: str) -> dict[str, Any]:
         return json.loads(response.read().decode("utf-8"))
 
 
-def target_for_origin(port: int) -> dict[str, Any]:
-    targets = list_targets(port)
-    target = next((row for row in targets if row.get("type") == "page" and "a.vsigo.cn" in (row.get("url") or "")), None)
-    if target:
-        return target
-    return open_tab(port, "https://a.vsigo.cn/login")
+def target_priority(target: dict[str, Any]) -> tuple[int, str]:
+    url = target.get("url") or ""
+    if "idata-dc-admin.vsigo.cn" in url:
+        return (0, url)
+    if "a.vsigo.cn" in url:
+        return (1, url)
+    if "vsigo.cn" in url:
+        return (2, url)
+    return (3, url)
+
+
+def responsive_browser_socket(port: int) -> WebSocket:
+    targets = sorted(
+        (row for row in list_targets(port) if row.get("type") == "page"),
+        key=target_priority,
+    )
+    if not targets:
+        targets = [open_tab(port, "https://a.vsigo.cn/login")]
+    errors: list[str] = []
+    for target in targets:
+        ws_url = target.get("webSocketDebuggerUrl") or ""
+        if not ws_url:
+            continue
+        try:
+            ws = WebSocket(ws_url, timeout=8)
+            cdp(ws, "Network.enable", timeout=8)
+            return ws
+        except Exception as exc:
+            errors.append(type(exc).__name__)
+    raise RuntimeError(f"No responsive ERP CDP page target; attempts={len(targets)} errors={errors}")
+
+
+def page_already_open(port: int, url: str) -> bool:
+    wanted = urllib.parse.urlsplit(url)
+    for target in list_targets(port):
+        current = urllib.parse.urlsplit(target.get("url") or "")
+        if target.get("type") == "page" and current.netloc == wanted.netloc and current.path == wanted.path:
+            return True
+    return False
 
 
 def cookie_params(name: str, value: str, days: int = 3) -> dict[str, Any]:
@@ -262,9 +295,7 @@ def cookie_params(name: str, value: str, days: int = 3) -> dict[str, Any]:
 
 
 def inject_browser_state(port: int, state: LoginState, pages: list[str]) -> None:
-    target = target_for_origin(port)
-    ws = WebSocket(target["webSocketDebuggerUrl"])
-    cdp(ws, "Network.enable")
+    ws = responsive_browser_socket(port)
     admin = {
         "UserID": state.admin_id,
         "RealName": state.real_name,
@@ -309,6 +340,8 @@ def inject_browser_state(port: int, state: LoginState, pages: list[str]) -> None
     cdp(ws, "Runtime.evaluate", {"expression": script, "awaitPromise": True, "returnByValue": True})
 
     for page in pages:
+        if page_already_open(port, page):
+            continue
         try:
             open_tab(port, page)
         except Exception:
